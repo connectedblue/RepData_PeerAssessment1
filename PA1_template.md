@@ -1,17 +1,20 @@
----
-title: 'Reproducible Research: Peer Assessment 1'
-output:
-  html_document:
-    keep_md: yes
-  pdf_document: default
-  word_document: default
----
-```{r initialise, echo=FALSE, results = "hide"}
-# set global settings so all code chunks can be viewed in the document
-library(knitr)
-library(dplyr)
-library(ggplot2)
-opts_chunk$set(echo=TRUE)
+# Reproducible Research: Peer Assessment 1
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
 ```
 
 ## Introduction
@@ -24,11 +27,22 @@ This assignment makes use of data from a personal activity monitoring device. Th
 
 The raw data is contained in a zip file which is unpacked and read into a variable called **steps**. The date column is converted into a date object to allow for easier processing.
 
-```{r dataload}
+
+```r
 unzip("./activity.zip")
 steps<-read.csv("./activity.csv", header = TRUE)
 steps$date <- as.Date(steps$date)
 head(steps)
+```
+
+```
+##   steps       date interval
+## 1    NA 2012-10-01        0
+## 2    NA 2012-10-01        5
+## 3    NA 2012-10-01       10
+## 4    NA 2012-10-01       15
+## 5    NA 2012-10-01       20
+## 6    NA 2012-10-01       25
 ```
 
 ## Number of Daily steps 
@@ -36,7 +50,8 @@ head(steps)
 The **steps** dataframe is summarised by grouping the time periods for each day and summing the total number of steps.  At this stage, the data contains missing values which are ignored for now.  This will be addressed later in the paper.  
 
 The resulting **daily_steps** variable can them be plotted as a histogram which gives a sense of how the daily total varies over the two months.
-```{r dailysteps}
+
+```r
 daily_steps <- steps %>% group_by(date) %>%
                          summarise(daily_steps=sum(steps, na.rm=TRUE))
 ggplot(daily_steps,aes(x=date,y=daily_steps))+
@@ -44,16 +59,18 @@ ggplot(daily_steps,aes(x=date,y=daily_steps))+
                    ylab("Daily Steps") + xlab("Date")
 ```
 
+![](PA1_template_files/figure-html/dailysteps-1.png)
+
 ## What is mean total number of steps taken per day?
 
 The **daily_steps** data frame can be used to calculate the mean number of steps per day as follows: 
-```{r meandaily}
+
+```r
 daily_mean_steps <- mean(daily_steps$daily_steps)
 daily_median_steps <- median(daily_steps$daily_steps)
-
 ```
 
-This gives a daily mean of `r daily_mean_steps` steps taken.  The daily median is `r daily_median_steps`.
+This gives a daily mean of 9354.2295082 steps taken.  The daily median is 10395.
 
 
 ## What is the average daily activity pattern?
