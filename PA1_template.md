@@ -17,6 +17,8 @@ The questions that will be addressed in this paper are:
 6. Histogram of the total number of steps taken each day after missing values are imputed
 7. Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
 
+\pagebreak
+
 ## Loading and preprocessing the data
 
 The raw data is contained in a zip file which is unpacked and read into a variable called **steps**. The raw data is pre-processed to allow easy analysis and address questions about the data:
@@ -82,6 +84,7 @@ daily_median_steps <- median(daily_steps$daily_steps)
 
 This gives a daily mean of 9354.2295082 steps taken.  The daily median is 10395.
 
+\pagebreak
 
 ## What is the average daily activity pattern?
 
@@ -95,7 +98,9 @@ daily_interval <- steps %>% group_by(interval) %>%
                          summarise(average_steps=mean(steps, na.rm=TRUE))
 
 # keep labels only ending in 00, ie on the hour
-hour_intervals <- ifelse(grepl('00$', daily_interval$interval), daily_interval$interval, FALSE)
+hour_intervals <- ifelse(grepl('00$', daily_interval$interval),
+                         daily_interval$interval, FALSE)
+
 ggplot(daily_interval,aes(x=interval,y=average_steps))+
                    geom_bar(stat="identity") +
                    ylab("Average Steps") + xlab("Day divided into 5 minute intervals") +
@@ -106,13 +111,16 @@ ggplot(daily_interval,aes(x=interval,y=average_steps))+
 
 ![](PA1_template_files/figure-html/dailyactivity-1.png)
 
-From the graph above, we can see that the average busiest period is between 8am and 9am, and a small calculation can be made to find the precise interval where the maximum occurs.  The daily intervals are ordered in reverse order, with the maximum number of steps at the top.  The first row of this ordering will therefore give the time interval where the maximum occurs.
+From the graph above, we can see that the average busiest period is between 8am and 9am, and a small calculation can be made to find the precise interval where the maximum occurs. 
+\pagebreak
+
+If the steps per interval are sorted into reverse order, then the maximum number of steps will be at the top.  The first row of this ordering will therefore give the time interval where the maximum occurs.
 
 ```r
 interval_max_steps <- daily_interval[order(daily_interval$average_steps, decreasing = T)[1],]
 ```
 
-This calculation shows that 08:35 is the 5 minute time period with the most steps on average, which also tallies with a visual inspection of the graph.
+This calculation shows that 08:35 is the 5 minute time period with the most steps on average (206.1698113 steps), which also tallies with a visual inspection of the graph.
 
 ## Imputing missing values
 
@@ -166,22 +174,21 @@ The plot now includes values for all days since the missing days now have values
 
 
 ```r
-subset(imputed_daily_steps, date=="2012-11-15")
-```
-
-```
-## Source: local data frame [1 x 2]
-## 
-##         date daily_steps
-##       (date)       (dbl)
-## 1 2012-11-15          41
+kable(subset(imputed_daily_steps, date=="2012-11-15"))
 ```
 
 
 
+date          daily_steps
+-----------  ------------
+2012-11-15             41
+
+
+\pagebreak
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
+The final question requires the steps data to be grouped by the type of day (weekday or weekend) and the time interval.  This allows a panel plot to be created showing the distribution of activity on weekdays and weekends
 
 ```r
 weekdayweekend_interval <- steps %>% group_by(daytype, interval) %>%
@@ -197,3 +204,6 @@ ggplot(weekdayweekend_interval,aes(x=interval,y=average_steps)) +
 
 ![](PA1_template_files/figure-html/weekdayweekend-1.png)
 
+We can see from the plots that, on average, there is more activity spread throughout the day at the weekend, but it doesn't have the burst during 8-9am like during the week.
+
+We might conclude from this that the individual has a deskbound job during the week, and they commute by running/walking each weekday morning.

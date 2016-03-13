@@ -1,6 +1,7 @@
 ---
 title: 'Reproducible Research: Peer Assessment 1'
 output:
+  word_document: default
   pdf_document: default
   html_document:
     keep_md: yes
@@ -95,7 +96,9 @@ daily_interval <- steps %>% group_by(interval) %>%
                          summarise(average_steps=mean(steps, na.rm=TRUE))
 
 # keep labels only ending in 00, ie on the hour
-hour_intervals <- ifelse(grepl('00$', daily_interval$interval), daily_interval$interval, FALSE)
+hour_intervals <- ifelse(grepl('00$', daily_interval$interval),
+                         daily_interval$interval, FALSE)
+
 ggplot(daily_interval,aes(x=interval,y=average_steps))+
                    geom_bar(stat="identity") +
                    ylab("Average Steps") + xlab("Day divided into 5 minute intervals") +
@@ -158,6 +161,7 @@ kable(subset(imputed_daily_steps, date=="2012-11-15"))
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
+The final question requires the steps data to be grouped by the type of day (weekday or weekend) and the time interval.  This allows a panel plot to be created showing the distribution of activity on weekdays and weekends
 ```{r weekdayweekend}
 weekdayweekend_interval <- steps %>% group_by(daytype, interval) %>%
                          summarise(average_steps=mean(steps, na.rm=TRUE))
@@ -170,3 +174,6 @@ ggplot(weekdayweekend_interval,aes(x=interval,y=average_steps)) +
                    ggtitle("Comparison of hourly activity between weekdays and the weekend")
 ```
 
+We can see from the plots that, on average, there is more activity spread throughout the day at the weekend, but it doesn't have the burst during 8-9am like during the week.
+
+We might conclude from this that the individual has a deskbound job during the week, and they commute by running/walking each weekday morning.
