@@ -78,6 +78,14 @@ img {
 <li>Histogram of the total number of steps taken each day after missing values are imputed</li>
 <li>Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends</li>
 </ol>
+<p>The high level approach to answering these questions is:</p>
+<ul>
+<li>Unpack the provided raw data from the provided <code>activity.zip</code> file, read in the csv file and add some additional columns needed for the analysis. This will create an analytic data set called <strong>steps</strong> which will be the basis for exploring the questions. At this stage the base data contains missing values</li>
+<li>A daily summary is made from which a histogram and median and mean can be calculated.</li>
+<li>The base data is re-summarised by interval to allow a time series analysis of the recorded steps.</li>
+<li>The missing data is studied, and a strategy is devised to impute those values. A new dataset is created with those missing values.</li>
+<li>Finally an analysis is made on the difference between weekdays and weekend data using the base data again.</li>
+</ul>
 <p></p>
 </div>
 <div id="loading-and-preprocessing-the-data" class="section level2">
