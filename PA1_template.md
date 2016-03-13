@@ -3,7 +3,7 @@
 
 ## Introduction
 
-It is now possible to collect a large amount of data about personal movement using activity monitoring devices such as a Fitbit, Nike Fuelband, or Jawbone Up. These type of devices are part of the “quantified self” movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. But these data remain under-utilized both because the raw data are hard to obtain and there is a lack of statistical methods and software for processing and interpreting the data.
+It is now possible to collect a large amount of data about personal movement using activity monitoring devices such as a Fitbit, Nike Fuelband, or Jawbone Up. These type of devices are part of the â€œquantified selfâ€ movement â€“ a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. But these data remain under-utilized both because the raw data are hard to obtain and there is a lack of statistical methods and software for processing and interpreting the data.
 
 This assignment makes use of data from a personal activity monitoring device. This device collects data at 5 minute intervals through out the day. The data consists of two months of data from an anonymous individual collected during the months of October and November, 2012 and include the number of steps taken in 5 minute intervals each day.
 
@@ -23,7 +23,7 @@ The high level approach to answering these questions is:
 * A daily summary is made from which a histogram and median and mean can be calculated.
 * The base data is re-summarised by interval to allow a time series analysis of the recorded steps.
 * The missing data is studied, and a strategy is devised to impute those values.  A new dataset is created with those missing values.
-* Finally an analysis is made on the difference between weekdays and weekend data using the base data again.
+* Finally an analysis is made on the difference between weekdays and weekend data using the imputed data.
 
 \pagebreak
 
@@ -90,7 +90,9 @@ daily_mean_steps <- mean(daily_steps$daily_steps)
 daily_median_steps <- median(daily_steps$daily_steps)
 ```
 
-This gives a daily mean of 9354.2295082 steps taken.  The daily median is 10395.
+
+This gives a daily mean of 9,354 steps taken.  The daily median is 10,395.
+
 
 \pagebreak
 
@@ -109,8 +111,7 @@ daily_interval <- steps %>% group_by(interval) %>%
 hour_intervals <- ifelse(grepl('00$', daily_interval$interval),
                          daily_interval$interval, FALSE)
 
-ggplot(daily_interval,aes(x=interval,y=average_steps))+
-                   geom_bar(stat="identity") +
+ggplot(daily_interval,aes(x=interval,y=average_steps, group=1))+ geom_line() +
                    ylab("Average Steps") + xlab("Day divided into 5 minute intervals") +
                    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
                    scale_x_discrete(breaks=hour_intervals) +
@@ -157,6 +158,8 @@ We can see that all the missing observations occur on only 8 days, and furthermo
 
 The strategy I have chosen for imputing missing values is to take the mean for each interval on the same day of week as the missing data.  That is, if one of the missing days is a Wednesday, then we will substitute the missing intervals with the mean of the equivalent intervals on all the other wednesdays that we do have observations for.
 
+A new analytic data set is created called **merged_steps** which contains the missing values and is used for the subsequent analysis.
+
 
 ```r
 wday_steps <- steps %>% group_by(dayofweek, interval)  %>%
@@ -191,6 +194,18 @@ date          daily_steps
 -----------  ------------
 2012-11-15             41
 
+The **imputed_daily_steps** data frame can be used to calculate the mean and median number of steps per day as follows: 
+
+```r
+imputed_daily_mean_steps <- mean(imputed_daily_steps$daily_steps)
+imputed_daily_median_steps <- median(imputed_daily_steps$daily_steps)
+```
+
+This gives a daily mean of 10,821 steps taken.  The daily median is 11,015.
+
+These values are higher than the raw data with the missing values.  This suggests that the days of week that were missing had a higher than average number of steps.
+
+
 
 \pagebreak
 
@@ -198,20 +213,21 @@ date          daily_steps
 
 The final question requires the steps data to be grouped by the type of day (weekday or weekend) and the time interval.  This allows a panel plot to be created showing the distribution of activity on weekdays and weekends
 
+The **merged_steps** base data is used in this analysis which contains the imputed values calculated in the previous question.
+
+
 ```r
-weekdayweekend_interval <- steps %>% group_by(daytype, interval) %>%
+weekdayweekend_interval <- merged_steps %>% group_by(daytype, interval) %>%
                          summarise(average_steps=mean(steps, na.rm=TRUE))
-ggplot(weekdayweekend_interval,aes(x=interval,y=average_steps)) +
-                   geom_bar(stat="identity") +
+ggplot(weekdayweekend_interval,aes(x=interval,y=average_steps, group=1)) + geom_line() +
                    ylab("Average Steps") + xlab("Day divided into 5 minute intervals") +
                    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
                    scale_x_discrete(breaks=hour_intervals) +
-                   facet_grid(. ~ daytype) +
+                   facet_grid(daytype ~ .) +
                    ggtitle("Comparison of hourly activity between weekdays and the weekend")
 ```
 
 ![](PA1_template_files/figure-html/weekdayweekend-1.png)
 
-We can see from the plots that, on average, there is more activity spread throughout the day at the weekend, but it doesn't have the burst during 8-9am like during the week.
+We can see from the plots that, on average, there is more activity spread throughout the day at the weekend, not just a burst during 8-9am like during the week.
 
-We might conclude from this that the individual has a deskbound job during the week, and they commute by running/walking each weekday morning.
